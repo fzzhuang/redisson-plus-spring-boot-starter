@@ -10,11 +10,15 @@ import cn.yishotech.starter.aop.*;
 import cn.yishotech.starter.distribute.impl.RedissonDistributeCache;
 import cn.yishotech.starter.lock.factory.LockFactory;
 import cn.yishotech.starter.lock.impl.RedissonDistributedLock;
+import cn.yishotech.starter.multi.impl.MultiCache;
+import cn.yishotech.starter.multi.listener.UpdateL1CacheListener;
 import cn.yishotech.starter.subscribe.impl.RedissonMessageQueue;
 import com.alibaba.fastjson2.JSON;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.redisson.Redisson;
@@ -34,7 +38,12 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.time.Duration;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <p>类路径:cn.yishotech.starter.config.RedissonPlusAutoConfiguration</p>
@@ -45,7 +54,7 @@ import java.util.Objects;
 @Slf4j
 @Configuration
 @ConditionalOnClass(Config.class)
-@EnableConfigurationProperties(RedissonProperties.class)
+@EnableConfigurationProperties({RedissonProperties.class, MultiCacheProperties.class})
 public class RedissonPlusAutoConfiguration {
 
 
@@ -103,15 +112,13 @@ public class RedissonPlusAutoConfiguration {
         String[] beanNamesForType = applicationContext.getBeanNamesForType(MessageListener.class);
         for (String beanName : beanNamesForType) {
             // 通过bean名字获取到监听bean
-            MessageListener bean = applicationContext.getBean(beanName, MessageListener.class);
+            MessageListener<?> bean = applicationContext.getBean(beanName, MessageListener.class);
             Class<? extends MessageListener> beanClass = bean.getClass();
             // 如果bean的注解里包含我们的自定义注解RedissonListener.class，则以RedissonListener注解的值作为name将该bean注册到bean工厂，方便在别处注入
             if (beanClass.isAnnotationPresent(RedissonListener.class)) {
                 RedissonListener redissonListener = beanClass.getAnnotation(RedissonListener.class);
-
                 RTopic topic = redissonClient.getTopic(redissonListener.topic());
-                topic.addListener(String.class, bean);
-
+                topic.addListener(Object.class, bean);
                 ConfigurableListableBeanFactory beanFactory = applicationContext.getBeanFactory();
                 beanFactory.registerSingleton(redissonListener.topic(), topic);
             }
@@ -157,5 +164,62 @@ public class RedissonPlusAutoConfiguration {
     @Bean
     public RedissonMessageQueue redissonMessageQueue() {
         return new RedissonMessageQueue();
+    }
+
+    @Bean("localCacheMap")
+    public Map<String, Cache<String, Object>> localCacheMap(MultiCacheProperties properties) {
+        List<MultiCacheProperties.L1Cache> l1Caches = properties.getL1Caches();
+        Map<String, Cache<String, Object>> cacheMap = new ConcurrentHashMap<>();
+        for (MultiCacheProperties.L1Cache l1Cache : l1Caches) {
+            Cache<String, Object> cache = Caffeine.newBuilder()
+                    .initialCapacity(l1Cache.getInitialCapacity())
+                    .maximumSize(l1Cache.getMaximumSize())
+                    .expireAfterWrite(parseTimeUnit(l1Cache.getExpire(), l1Cache.getTimeUnit()))
+                    .build();
+            cacheMap.put(l1Cache.getCacheName(), cache);
+        }
+        return cacheMap;
+    }
+
+    @Bean
+    public MultiCache multiCache() {
+        return new MultiCache();
+    }
+
+    @Bean
+    public MultiCacheAspect multiCacheAspect() {
+        return new MultiCacheAspect();
+    }
+
+    @Bean
+    public MultiCacheEvictAspect multiCacheEvictAspect() {
+        return new MultiCacheEvictAspect();
+    }
+
+    @Bean
+    public MultiCachePutAspect multiCachePutAspect() {
+        return new MultiCachePutAspect();
+    }
+
+    @Bean
+    public UpdateL1CacheListener updateL1CacheListener() {
+        return new UpdateL1CacheListener();
+    }
+
+    /**
+     * 解析TimeUnit格式过期时间
+     *
+     * @param expire 过期时间
+     * @param unit   单位
+     * @return 过期时间
+     */
+    private Duration parseTimeUnit(long expire, TimeUnit unit) {
+        return switch (unit) {
+            case MINUTES -> Duration.ofMinutes(expire);
+            case HOURS -> Duration.ofHours(expire);
+            case DAYS -> Duration.ofDays(expire);
+            case MICROSECONDS -> Duration.ofMillis(expire);
+            default -> Duration.ofSeconds(expire);
+        };
     }
 }
