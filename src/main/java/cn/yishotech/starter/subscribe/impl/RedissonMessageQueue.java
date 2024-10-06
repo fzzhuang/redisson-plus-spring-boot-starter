@@ -35,32 +35,29 @@ public class RedissonMessageQueue implements IMessageQueue {
     public void sendMessage(String topic, Event<?> event) {
         log.info("发送消息 topic:{} event:{}", topic, JSON.toJSONString(event));
         RTopic rTopic = redissonClient.getTopic(topic);
-        String message = JSON.toJSONString(event);
-        rTopic.publish(message);
+        rTopic.publish(event);
     }
 
     @Override
     public void sendDelayMessage(String topic, Event<?> event, long delay) {
         log.info("延迟队列 topic:{} event:{} delay:{}", topic, JSON.toJSONString(event), delay);
         // 1. 创建阻塞队列
-        RBlockingQueue<String> blockingQueue = redissonClient.getBlockingQueue(topic);
+        RBlockingQueue<Object> blockingQueue = redissonClient.getBlockingQueue(topic);
         // 2. 将创建的阻塞队列放入延迟队列中
-        RDelayedQueue<String> delayedQueue = redissonClient.getDelayedQueue(blockingQueue);
+        RDelayedQueue<Object> delayedQueue = redissonClient.getDelayedQueue(blockingQueue);
         // 3. 发送消息到延迟队列中
-        String message = JSON.toJSONString(event);
-        delayedQueue.offer(message, delay, TimeUnit.MINUTES);
+        delayedQueue.offer(event, delay, TimeUnit.MINUTES);
     }
 
     @Override
     public void sendDelayMessage(String topic, Event<?> event, long delay, TimeUnit timeUnit) {
         log.info("延迟队列 topic:{} event:{} delay:{} unit:{}", topic, JSON.toJSONString(event), delay, timeUnit);
         // 1. 创建阻塞队列
-        RBlockingQueue<String> blockingQueue = redissonClient.getBlockingQueue(topic);
+        RBlockingQueue<Object> blockingQueue = redissonClient.getBlockingQueue(topic);
         // 2. 将创建的阻塞队列放入延迟队列中
-        RDelayedQueue<String> delayedQueue = redissonClient.getDelayedQueue(blockingQueue);
+        RDelayedQueue<Object> delayedQueue = redissonClient.getDelayedQueue(blockingQueue);
         // 3. 发送消息到延迟队列中
-        String message = JSON.toJSONString(event);
-        delayedQueue.offer(message, delay, timeUnit);
+        delayedQueue.offer(event, delay, timeUnit);
     }
 
     @Override
