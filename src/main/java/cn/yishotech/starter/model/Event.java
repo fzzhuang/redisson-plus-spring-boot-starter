@@ -23,7 +23,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Event<T> {
+public abstract class Event<T> {
     /**
      * 事件ID
      */
