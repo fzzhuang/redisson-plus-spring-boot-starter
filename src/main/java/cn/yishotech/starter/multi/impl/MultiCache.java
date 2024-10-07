@@ -6,8 +6,8 @@
 package cn.yishotech.starter.multi.impl;
 
 import cn.yishotech.starter.distribute.IDistributeCache;
+import cn.yishotech.starter.event.UpdateL1CacheEvent;
 import cn.yishotech.starter.model.DataType;
-import cn.yishotech.starter.model.Event;
 import cn.yishotech.starter.model.OperateType;
 import cn.yishotech.starter.model.UpdateCache;
 import cn.yishotech.starter.multi.IMultiCache;
@@ -108,7 +108,7 @@ public class MultiCache implements IMultiCache {
 
         // 封装事件
         UpdateCache updateCache = UpdateCache.builder().cacheName(cacheName).key(key).value(value).operateType(operateType).build();
-        Event<UpdateCache> event = Event.<UpdateCache>builder().desc("更新L1缓存").data(updateCache).build();
+        UpdateL1CacheEvent event = UpdateL1CacheEvent.create(updateCache);
         // 发送消息
         messageQueue.sendMessage("updateL1Cache", event);
     }

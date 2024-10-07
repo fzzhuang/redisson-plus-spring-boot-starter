@@ -6,7 +6,7 @@
 package cn.yishotech.starter.multi.listener;
 
 import cn.yishotech.starter.annotation.RedissonListener;
-import cn.yishotech.starter.model.Event;
+import cn.yishotech.starter.event.UpdateL1CacheEvent;
 import cn.yishotech.starter.model.OperateType;
 import cn.yishotech.starter.model.UpdateCache;
 import com.alibaba.fastjson2.JSON;
@@ -27,13 +27,13 @@ import java.util.Map;
 @Slf4j
 @Component
 @RedissonListener(topic = "updateL1Cache")
-public class UpdateL1CacheListener implements MessageListener<Event<UpdateCache>> {
+public class UpdateL1CacheListener implements MessageListener<UpdateL1CacheEvent> {
 
     @Resource
     private Map<String, Cache<String, Object>> localCacheMap;
 
     @Override
-    public void onMessage(CharSequence charSequence, Event<UpdateCache> updateCacheEvent) {
+    public void onMessage(CharSequence charSequence, UpdateL1CacheEvent updateCacheEvent) {
         log.info("接收到更新L1 cache消息, message:{}", JSON.toJSONString(updateCacheEvent));
         UpdateCache updateCache = updateCacheEvent.getData();
         OperateType operateType = updateCache.getOperateType();
