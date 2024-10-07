@@ -21,6 +21,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class RedissonProperties {
 
     /**
+     * 是否开启
+     */
+    private boolean enabled = false;
+
+    /**
      * Redisson 连接地址，例如：redis://127.0.0.1:6379。
      */
     private String address;

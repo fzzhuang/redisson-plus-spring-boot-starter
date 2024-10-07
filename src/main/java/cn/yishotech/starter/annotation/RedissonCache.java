@@ -28,7 +28,7 @@ public @interface RedissonCache {
     /**
      * 缓存键
      */
-    String key() default "";
+    String[] keys() default "";
 
     /**
      * 查询数据类型

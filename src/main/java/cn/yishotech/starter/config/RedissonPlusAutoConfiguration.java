@@ -33,6 +33,7 @@ import org.redisson.config.SentinelServersConfig;
 import org.redisson.config.SingleServerConfig;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -54,6 +55,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Configuration
 @ConditionalOnClass(Config.class)
+@ConditionalOnProperty(prefix = "redisson", value = "enabled", havingValue = "true")
 @EnableConfigurationProperties({RedissonProperties.class, MultiCacheProperties.class})
 public class RedissonPlusAutoConfiguration {
 

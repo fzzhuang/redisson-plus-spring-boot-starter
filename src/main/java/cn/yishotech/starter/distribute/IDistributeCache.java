@@ -134,7 +134,7 @@ public interface IDistributeCache {
     /**
      * 获取缓存Map
      *
-     * @param key key
+     * @param key keys
      * @param <K> 键泛型
      * @param <V> 值泛型
      * @return map信息

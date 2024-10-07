@@ -29,7 +29,7 @@ public @interface RedissonCachePut {
     /**
      * 缓存键
      */
-    String key() default "";
+    String[] keys() default "";
 
     /**
      * 缓存数据类型

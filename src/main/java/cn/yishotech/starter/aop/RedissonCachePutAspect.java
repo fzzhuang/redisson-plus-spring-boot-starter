@@ -103,11 +103,21 @@ public class RedissonCachePutAspect {
     private String getCacheKey(Method method, Object[] args, RedissonProperties properties, RedissonCachePut annotation) {
         String cachePrefix = properties.getCachePrefix();
         String prefix = annotation.prefix();
-        String key = annotation.key();
-        key = SpelUtil.parseEl(method, args, key);
+        String[] keys = annotation.keys();
+        String key = parseKeys(method, args, keys);
         // 避免重复判断字符串是否为空
         boolean prefixBlank = StringUtils.isBlank(cachePrefix);
         String combinedPrefix = prefixBlank ? "" : cachePrefix + ":";
         return String.format("%s%s_%s", combinedPrefix, prefix, key);
+    }
+
+    private static String parseKeys(Method method, Object[] args, String[] keys) {
+        // key列表
+        StringBuilder cacheKey = new StringBuilder();
+        for (String key : keys) {
+            String parsed = SpelUtil.parseEl(method, args, key);
+            cacheKey.append("_").append(parsed);
+        }
+        return cacheKey.toString();
     }
 }

@@ -26,5 +26,5 @@ public @interface RedissonCacheEvict {
     /**
      * 缓存键
      */
-    String key() default "";
+    String[] keys() default "";
 }

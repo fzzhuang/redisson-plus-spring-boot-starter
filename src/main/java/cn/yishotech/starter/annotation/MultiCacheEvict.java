@@ -31,5 +31,5 @@ public @interface MultiCacheEvict {
     /**
      * 缓存key
      */
-    String key() default "";
+    String[] keys() default "";
 }

@@ -50,7 +50,7 @@ public class SpelUtil {
     /***
      * 获取方法key
      * @param method 方法
-     * @return key
+     * @return keys
      */
     public static String getMethodKey(Method method) {
         return method.getDeclaringClass().getName() + "." + method.getName();

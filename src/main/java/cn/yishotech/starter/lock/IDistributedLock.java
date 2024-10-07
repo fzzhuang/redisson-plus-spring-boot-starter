@@ -21,7 +21,7 @@ public interface IDistributedLock {
     /**
      * 加锁
      *
-     * @param lockKey key
+     * @param lockKey keys
      * @return 锁
      */
     RLock lock(String lockKey);
@@ -29,7 +29,7 @@ public interface IDistributedLock {
     /**
      * 加锁
      *
-     * @param lockKey   key
+     * @param lockKey   keys
      * @param leaseTime 超时时间，默认单位秒
      * @return 锁
      */
@@ -38,7 +38,7 @@ public interface IDistributedLock {
     /**
      * 加锁
      *
-     * @param lockKey   key
+     * @param lockKey   keys
      * @param leaseTime 超时时间
      * @param timeUnit  单位
      * @return 锁
@@ -49,7 +49,7 @@ public interface IDistributedLock {
     /**
      * 尝试获取锁
      *
-     * @param lockKey   key
+     * @param lockKey   keys
      * @param waitTime  最大等待时间
      * @param leaseTime 超过指定的时间后释放锁
      * @param timeUnit  单位
@@ -60,7 +60,7 @@ public interface IDistributedLock {
     /**
      * 尝试获取锁
      *
-     * @param lockKey   lock key
+     * @param lockKey   lock keys
      * @param leaseTime 超时时间
      * @param timeUnit  单位
      * @return 锁是否获取成功
@@ -71,7 +71,7 @@ public interface IDistributedLock {
     /**
      * 解锁
      *
-     * @param lockKey key
+     * @param lockKey keys
      */
     void unlock(String lockKey);
 
@@ -85,14 +85,14 @@ public interface IDistributedLock {
     /**
      * 释放锁
      *
-     * @param lockKey key
+     * @param lockKey keys
      */
     void release(String lockKey);
 
     /**
      * 执行分布式锁
      *
-     * @param lockKey   lock key
+     * @param lockKey   lock keys
      * @param waitTime  等待时间
      * @param leaseTime 释放时间
      * @param timeUnit  单位
@@ -104,7 +104,7 @@ public interface IDistributedLock {
     /**
      * 执行分布式锁
      *
-     * @param lockKey  lock key
+     * @param lockKey  lock keys
      * @param timeout  超时时间
      * @param supplier 执行方法
      * @param <T>      泛型
@@ -114,7 +114,7 @@ public interface IDistributedLock {
     /**
      * 执行分布式锁
      *
-     * @param lockKey  lock key
+     * @param lockKey  lock keys
      * @param supplier 执行方法
      * @param <T>      泛型
      */
