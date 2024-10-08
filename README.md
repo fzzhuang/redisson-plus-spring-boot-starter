@@ -234,6 +234,27 @@ public class UserDelayConsumer implements CommandLineRunner {
     }
 }
 ```
+
+**注意:** 使用注解时，需要在pom.xml中配置 **-parameters**
+```xml
+<build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>17</source>
+                    <target>17</target>
+                    <encoding>UTF-8</encoding>
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+```
 ## 许可证
 
 根据 License 许可证分发。打开 [LICENSE](LICENSE) 查看更多内容。
