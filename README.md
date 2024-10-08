@@ -1,8 +1,8 @@
 <h3 align="center">Redisson Plus Starter</h3>
 
 ## 介绍
-Redis Plus增强组件，通过注解的方式简化了分布式锁、消息队列、发布订阅、缓存等Redis特性的使用。
-实现多级缓存，并且支持注解实现，消息队列更新节点。
+Redisson Plus增强组件，通过注解的方式简化了分布式锁、消息队列、发布订阅、缓存等。
+实现基于Caffeine+Redisson实现多级缓存，并且支持注解，消息队列更新节点。
 
 - 分布式锁：支持可重入锁、公平锁、读写锁等多种锁类型。
 - 消息队列：自动注册消息队列监听器，简化消息消费。
@@ -53,7 +53,7 @@ public class UserServiceImp implements UserService {
      * @return 用户实体, tips:保存数据时必须指定保存的数据类型，比如这里的UserEntity
      */
     @Override
-    @RedissonCachePut(prefix = "user", key = "#uid", timeout = 10)
+    @RedissonCachePut(prefix = "user", keys = "#uid", timeout = 10)
     public UserEntity getUserInfo(String uid) {
         log.info("save user info by uid: {}", uid);
         return UserEntity.builder()
@@ -89,7 +89,7 @@ public class UserServiceImp implements UserService {
      * @param uid 用户ID
      */
     @Override
-    @RedissonCacheEvict(prefix = "user", key = "#uid")
+    @RedissonCacheEvict(prefix = "user", keys = "#uid")
     public void getUserInfo3(String uid) {
         log.info("delete user by uid: {}", uid);
     }
@@ -101,7 +101,7 @@ public class UserServiceImp implements UserService {
      * @return 保存的数据类型
      */
     @Override
-    @RedissonCachePut(prefix = "user_map", key = "#uid", type = DataType.MAP)
+    @RedissonCachePut(prefix = "user_map", keys = "#uid", type = DataType.MAP)
     public Map<String, Object> saveMap(String uid, UserEntity userInfo) {
         Map<String, Object> map = new HashMap<>();
         map.put("uid", uid);
@@ -115,7 +115,7 @@ public class UserServiceImp implements UserService {
      * @return Map
      */
     @Override
-    @RedissonCache(prefix = "user_map", key = "#uid", type = DataType.MAP)
+    @RedissonCache(prefix = "user_map", keys = "#uid", type = DataType.MAP)
     public Map<String, Object> getMapInfo(String uid) {
         Map<String, Object> map = new HashMap<>();
         map.put("demo", "暂无消息");
@@ -147,7 +147,7 @@ public class UserServiceImp implements UserService {
      * @return 消息类型
      */
     @Override
-    @MultiCachePut(cacheName = "user", prefix = "demo", key = "#uid")
+    @MultiCachePut(cacheName = "user", prefix = "demo", keys = "#uid")
     public Map<String, Object> setCache(String uid) {
         log.info("multi cache set user by uid: {}", uid);
         UserEntity userEntity = UserEntity.builder()
@@ -174,7 +174,7 @@ public class UserServiceImp implements UserService {
      * @return 数据类型
      */
     @Override
-    @MultiCache(cacheName = "user", prefix = "demo", key = "#uid")
+    @MultiCache(cacheName = "user", prefix = "demo", keys = "#uid")
     public Map<String, Object> getCache(String uid) {
         log.info("multi cache get user by uid: {}", uid);
         return null;
@@ -185,7 +185,7 @@ public class UserServiceImp implements UserService {
      * @param uid 用户Id
      */
     @Override
-    @MultiCacheEvict(cacheName = "user", prefix = "demo", key = "#uid")
+    @MultiCacheEvict(cacheName = "user", prefix = "demo", keys = "#uid")
     public void delCache(String uid) {
         log.info("multi cache delete user by uid: {}", uid);
     }
