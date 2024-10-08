@@ -38,8 +38,10 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.CollectionUtils;
 
 import java.time.Duration;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -171,6 +173,10 @@ public class RedissonPlusAutoConfiguration {
     @Bean("localCacheMap")
     public Map<String, Cache<String, Object>> localCacheMap(MultiCacheProperties properties) {
         List<MultiCacheProperties.L1Cache> l1Caches = properties.getL1Caches();
+        if (CollectionUtils.isEmpty(l1Caches)) {
+            log.warn("localCacheMap is empty");
+            return Collections.emptyMap();
+        }
         Map<String, Cache<String, Object>> cacheMap = new ConcurrentHashMap<>();
         for (MultiCacheProperties.L1Cache l1Cache : l1Caches) {
             Cache<String, Object> cache = Caffeine.newBuilder()
