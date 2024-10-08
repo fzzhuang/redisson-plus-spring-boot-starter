@@ -1,1 +1,1 @@
-cn.yishotech.starter.config.RedissonPlusAutoConfiguration
+cn.yishotech.starter.redisson.config.RedissonPlusAutoConfiguration
