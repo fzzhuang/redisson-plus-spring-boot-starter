@@ -68,7 +68,7 @@ public class RedissonCacheAspect {
         // 避免重复判断字符串是否为空
         boolean prefixBlank = StringUtils.isBlank(cachePrefix);
         String combinedPrefix = prefixBlank ? "" : cachePrefix + ":";
-        return String.format("%s%s_%s", combinedPrefix, prefix, key);
+        return String.format("%s%s%s", combinedPrefix, prefix, key);
     }
 
     private static String parseKeys(Method method, Object[] args, String[] keys) {
@@ -76,7 +76,7 @@ public class RedissonCacheAspect {
         StringBuilder cacheKey = new StringBuilder();
         for (String key : keys) {
             String parsed = SpelUtil.parseEl(method, args, key);
-            cacheKey.append(parsed);
+            cacheKey.append("_").append(parsed);
         }
         return cacheKey.toString();
     }
