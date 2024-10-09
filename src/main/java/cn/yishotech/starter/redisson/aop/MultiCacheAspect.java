@@ -19,6 +19,7 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
+import java.util.Objects;
 
 /**
  * <p>类路径:cn.yishotech.starter.aop.MultiCacheAspect</p>
@@ -44,7 +45,18 @@ public class MultiCacheAspect {
         MultiCache annotation = method.getAnnotation(MultiCache.class);
         // 获取缓存key
         String key = getCacheKey(method, joinPoint.getArgs(), properties, annotation);
-        return multiCache.getValue(annotation.cacheName(), key, annotation.type());
+        Object value = multiCache.getValue(annotation.cacheName(), key, annotation.type());
+        // 如果缓存中有数据，则直接返回
+        if (Objects.nonNull(value)) return value;
+        try {
+            // 执行方法，并将结果放入缓存
+            value = joinPoint.proceed();
+            multiCache.setValue(annotation.cacheName(), key, value, annotation.expire(), annotation.unit(), annotation.type());
+            return value;
+        } catch (Throwable e) {
+            log.error("执行方法失败", e);
+            throw new RuntimeException(e);
+        }
     }
 
     private String getCacheKey(Method method, Object[] args, RedissonProperties properties, MultiCache annotation) {

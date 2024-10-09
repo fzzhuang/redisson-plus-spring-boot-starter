@@ -8,6 +8,7 @@ package cn.yishotech.starter.redisson.annotation;
 import cn.yishotech.starter.redisson.model.DataType;
 
 import java.lang.annotation.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <p>类路径:cn.yishotech.starter.annotation.MultiCache</p>
@@ -34,6 +35,16 @@ public @interface MultiCache {
      * 缓存key
      */
     String[] keys() default "";
+
+    /**
+     * 缓存过期时间，单位分钟
+     */
+    int expire() default 0;
+
+    /**
+     * 缓存过期时间单位
+     */
+    TimeUnit unit() default TimeUnit.MINUTES;
 
     /**
      * 数据类型
