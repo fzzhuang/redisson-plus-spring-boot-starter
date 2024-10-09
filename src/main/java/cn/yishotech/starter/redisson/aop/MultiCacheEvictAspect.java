@@ -64,7 +64,7 @@ public class MultiCacheEvictAspect {
         StringBuilder cacheKey = new StringBuilder();
         for (String key : keys) {
             String parsed = SpelUtil.parseEl(method, args, key);
-            cacheKey.append("_").append(parsed);
+            cacheKey.append(parsed);
         }
         return cacheKey.toString();
     }
