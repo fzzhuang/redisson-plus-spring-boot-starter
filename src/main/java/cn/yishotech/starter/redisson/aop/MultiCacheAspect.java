@@ -54,7 +54,7 @@ public class MultiCacheAspect {
             multiCache.setValue(annotation.cacheName(), key, value, annotation.expire(), annotation.unit(), annotation.type());
             return value;
         } catch (Throwable e) {
-            log.error("执行方法失败", e);
+            log.error("更新多级缓存失败", e);
             throw new RuntimeException(e);
         }
     }
