@@ -24,6 +24,11 @@ import java.util.concurrent.TimeUnit;
 @ConfigurationProperties(prefix = "multi.cache")
 public class MultiCacheProperties {
 
+    /**
+     * 是否允许缓存null值
+     */
+    private boolean allowNullValue = false;
+
     private List<L1Cache> l1Caches;
 
     @Data

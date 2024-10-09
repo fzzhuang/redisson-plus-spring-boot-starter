@@ -6,6 +6,7 @@
 package cn.yishotech.starter.redisson.aop;
 
 import cn.yishotech.starter.redisson.annotation.MultiCache;
+import cn.yishotech.starter.redisson.config.MultiCacheProperties;
 import cn.yishotech.starter.redisson.config.RedissonProperties;
 import cn.yishotech.starter.redisson.multi.IMultiCache;
 import cn.yishotech.starter.redisson.util.SpelUtil;
@@ -35,6 +36,8 @@ public class MultiCacheAspect {
     @Resource
     private RedissonProperties properties;
     @Resource
+    private MultiCacheProperties multiCacheProperties;
+    @Resource
     private IMultiCache multiCache;
 
     @Around("@annotation(cn.yishotech.starter.redisson.annotation.MultiCache)")
@@ -51,7 +54,11 @@ public class MultiCacheAspect {
         try {
             // 执行方法，并将结果放入缓存
             value = joinPoint.proceed();
-            multiCache.setValue(annotation.cacheName(), key, value, annotation.expire(), annotation.unit(), annotation.type());
+            boolean allowNullValue = multiCacheProperties.isAllowNullValue();
+            // 缓存中允许为空值
+            if (allowNullValue || Objects.nonNull(value)){
+                multiCache.setValue(annotation.cacheName(), key, value, annotation.expire(), annotation.unit(), annotation.type());
+            }
             return value;
         } catch (Throwable e) {
             log.error("更新多级缓存失败", e);
