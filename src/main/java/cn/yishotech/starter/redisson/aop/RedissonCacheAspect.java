@@ -20,6 +20,7 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
+import java.util.Objects;
 
 /**
  * <p>类路径:cn.yishotech.starter.aop.RedissonCacheAspect</p>
@@ -47,7 +48,22 @@ public class RedissonCacheAspect {
         String key = getCacheKey(method, joinPoint.getArgs(), properties, annotation);
         DataType type = annotation.type();
         // 查询缓存
-        return getCacheValue(key, type);
+        Object cacheValue = getCacheValue(key, type);
+        if (Objects.nonNull(cacheValue)) return cacheValue;
+        try {
+            Object result = joinPoint.proceed();
+            // 缓存结果
+            long expire = annotation.expire();
+            if (expire > 0) {
+                distributeCache.setValue(key, result, expire, annotation.unit());
+            } else {
+                distributeCache.setValue(key, result);
+            }
+            return result;
+        } catch (Throwable e) {
+            log.error("更新缓存失败", e);
+            throw new RuntimeException(e);
+        }
     }
 
     private Object getCacheValue(String key, DataType type) {
