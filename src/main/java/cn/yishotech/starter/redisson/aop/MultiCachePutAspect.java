@@ -66,6 +66,9 @@ public class MultiCachePutAspect {
         StringBuilder cacheKey = new StringBuilder();
         for (String key : keys) {
             String parsed = SpelUtil.parseEl(method, args, key);
+            if (StringUtils.isBlank(parsed)){
+                return cacheKey.toString();
+            }
             cacheKey.append("_").append(parsed);
         }
         return cacheKey.toString();

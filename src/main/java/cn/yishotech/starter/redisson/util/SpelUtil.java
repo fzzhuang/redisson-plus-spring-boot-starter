@@ -5,6 +5,7 @@
  */
 package cn.yishotech.starter.redisson.util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
@@ -13,6 +14,7 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 import java.lang.reflect.Method;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -43,6 +45,8 @@ public class SpelUtil {
             //所有参数都作为原材料扔进去
             context.setVariable(params[i], args[i]);
         }
+        if (StringUtils.isBlank(spEl)) return "";
+        if (!spEl.startsWith("#")) return spEl;
         Expression expression = parser.parseExpression(spEl);
         return expression.getValue(context, String.class);
     }
