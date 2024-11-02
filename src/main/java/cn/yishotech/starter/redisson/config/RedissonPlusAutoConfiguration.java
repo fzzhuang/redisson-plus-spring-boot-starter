@@ -82,6 +82,9 @@ public class RedissonPlusAutoConfiguration {
                     .setScanInterval(redissonProperties.getScanInterval())
                     .setSlaveConnectionPoolSize(redissonProperties.getSlaveConnectionPoolSize())
                     .setMasterName(masterName);
+            if (StringUtils.isNotBlank(redissonProperties.getPassword())) {
+                sentinelServersConfig.setPassword(redissonProperties.getPassword());
+            }
             log.info("配置哨兵模式：{}", JSON.toJSONString(sentinelServersConfig));
         } else if (Objects.nonNull(clusterNodes) && clusterNodes.length > 0) {
             // 配置集群模式

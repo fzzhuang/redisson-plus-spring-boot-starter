@@ -23,7 +23,7 @@ public class RedissonProperties {
     /**
      * 是否开启
      */
-    private boolean enabled = false;
+    private boolean enabled = true;
 
     /**
      * Redisson 连接地址，例如：redis://127.0.0.1:6379。

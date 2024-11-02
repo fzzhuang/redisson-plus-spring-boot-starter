@@ -5,7 +5,10 @@
  */
 package cn.yishotech.starter.redisson.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -17,6 +20,9 @@ import java.util.UUID;
  * <p>创建时间:2024/10/06 17:38</p>
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class Event<T> {
     /**
      * 事件ID

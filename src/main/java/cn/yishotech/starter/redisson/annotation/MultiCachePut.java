@@ -44,7 +44,7 @@ public @interface MultiCachePut {
     /**
      * 缓存超时时间
      */
-    long timeout() default 0;
+    long expire() default 0;
 
     /**
      * 时间单位

@@ -39,7 +39,7 @@ public @interface RedissonCachePut {
     /**
      * 缓存超时时间
      */
-    long timeout() default 0;
+    long expire() default 0;
 
     /**
      * 时间单位

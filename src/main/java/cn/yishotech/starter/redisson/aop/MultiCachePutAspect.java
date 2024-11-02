@@ -46,7 +46,7 @@ public class MultiCachePutAspect {
         // 获取缓存key
         String key = getCacheKey(method, joinPoint.getArgs(), properties, annotation);
         // 更新缓存
-        multiCache.setValue(annotation.cacheName(), key, joinPoint.proceed(), annotation.timeout(), annotation.timeUnit(), annotation.type());
+        multiCache.setValue(annotation.cacheName(), key, joinPoint.proceed(), annotation.expire(), annotation.timeUnit(), annotation.type());
         return joinPoint.proceed();
     }
 

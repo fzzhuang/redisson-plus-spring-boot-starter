@@ -57,7 +57,7 @@ public class RedissonCachePutAspect {
 
     private void setCacheValue(String key, RedissonCachePut annotation, Object proceed) {
         DataType type = annotation.type();
-        long timeout = annotation.timeout();
+        long timeout = annotation.expire();
         TimeUnit timeUnit = annotation.timeUnit();
 
         boolean hasTimeout = timeout > 0;
