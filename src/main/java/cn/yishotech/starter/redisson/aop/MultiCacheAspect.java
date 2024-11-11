@@ -8,6 +8,7 @@ package cn.yishotech.starter.redisson.aop;
 import cn.yishotech.starter.redisson.annotation.MultiCache;
 import cn.yishotech.starter.redisson.config.MultiCacheProperties;
 import cn.yishotech.starter.redisson.config.RedissonProperties;
+import cn.yishotech.starter.redisson.model.DataType;
 import cn.yishotech.starter.redisson.multi.IMultiCache;
 import cn.yishotech.starter.redisson.util.SpelUtil;
 import jakarta.annotation.Resource;
@@ -20,7 +21,7 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * <p>类路径:cn.yishotech.starter.aop.MultiCacheAspect</p>
@@ -48,7 +49,7 @@ public class MultiCacheAspect {
         MultiCache annotation = method.getAnnotation(MultiCache.class);
         // 获取缓存key
         String key = getCacheKey(method, joinPoint.getArgs(), properties, annotation);
-        Object value = multiCache.getValue(annotation.cacheName(), key, annotation.type());
+        Object value = getCacheValue(annotation.cacheName(), key, annotation.type());
         // 如果缓存中有数据，则直接返回
         if (Objects.nonNull(value)) return value;
         try {
@@ -56,7 +57,7 @@ public class MultiCacheAspect {
             value = joinPoint.proceed();
             boolean allowNullValue = multiCacheProperties.isAllowNullValue();
             // 缓存中允许为空值
-            if (allowNullValue || Objects.nonNull(value)){
+            if (allowNullValue || Objects.nonNull(value)) {
                 multiCache.setValue(annotation.cacheName(), key, value, annotation.expire(), annotation.unit(), annotation.type());
             }
             return value;
@@ -82,11 +83,31 @@ public class MultiCacheAspect {
         StringBuilder cacheKey = new StringBuilder();
         for (String key : keys) {
             String parsed = SpelUtil.parseEl(method, args, key);
-            if (StringUtils.isBlank(parsed)){
+            if (StringUtils.isBlank(parsed)) {
                 return cacheKey.toString();
             }
             cacheKey.append("_").append(parsed);
         }
         return cacheKey.toString();
+    }
+
+    private Object getCacheValue(String cacheName, String key, DataType dataType) {
+        Object value = multiCache.getValue(cacheName, key, dataType);
+        if (DataType.LIST.equals(dataType)) {
+            List<?> list = (List<?>) value;
+            if (!list.isEmpty()) return new ArrayList<>(list);
+        } else if (DataType.SET.equals(dataType)) {
+            Set<?> set = (Set<?>) value;
+            if (!set.isEmpty()) return set;
+        } else if (DataType.SORTEDSET.equals(dataType)) {
+            SortedSet<?> sortedSet = (SortedSet<?>) value;
+            if (!sortedSet.isEmpty()) return sortedSet;
+        } else if (DataType.MAP.equals(dataType)) {
+            Map<?, ?> map = (Map<?, ?>) value;
+            if (!map.isEmpty()) return map;
+        } else if (DataType.DEFAULT.equals(dataType)) {
+            if (Objects.nonNull(value)) return value;
+        }
+        return null;
     }
 }
