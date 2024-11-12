@@ -55,6 +55,9 @@ public class MultiCacheAspect {
         try {
             // 执行方法，并将结果放入缓存
             value = joinPoint.proceed();
+            // 列表类型不允许为空
+            value = parsedValue(annotation.type(), value);
+            // 缓存中不允许为空值
             boolean allowNullValue = multiCacheProperties.isAllowNullValue();
             // 缓存中允许为空值
             if (allowNullValue || Objects.nonNull(value)) {
@@ -65,6 +68,25 @@ public class MultiCacheAspect {
             log.error("更新多级缓存失败", e);
             throw new RuntimeException(e);
         }
+    }
+
+    private Object parsedValue(DataType type, Object value) {
+        if (DataType.LIST.equals(type)) {
+            List<?> list = (List<?>) value;
+            if (!list.isEmpty()) return list;
+        } else if (DataType.MAP.equals(type)) {
+            Map<?, ?> map = (Map<?, ?>) value;
+            if (!map.isEmpty()) return map;
+        } else if (DataType.SET.equals(type)) {
+            Set<?> set = (Set<?>) value;
+            if (!set.isEmpty()) return set;
+        } else if (DataType.SORTEDSET.equals(type)) {
+            SortedSet<?> sortedSet = (SortedSet<?>) value;
+            if (!sortedSet.isEmpty()) return sortedSet;
+        } else {
+            if (Objects.nonNull(value)) return value;
+        }
+        return null;
     }
 
     private String getCacheKey(Method method, Object[] args, RedissonProperties properties, MultiCache annotation) {

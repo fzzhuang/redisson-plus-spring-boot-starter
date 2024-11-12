@@ -6,7 +6,9 @@
 package cn.yishotech.starter.redisson.aop;
 
 import cn.yishotech.starter.redisson.annotation.MultiCachePut;
+import cn.yishotech.starter.redisson.config.MultiCacheProperties;
 import cn.yishotech.starter.redisson.config.RedissonProperties;
+import cn.yishotech.starter.redisson.model.DataType;
 import cn.yishotech.starter.redisson.multi.IMultiCache;
 import cn.yishotech.starter.redisson.util.SpelUtil;
 import jakarta.annotation.Resource;
@@ -19,6 +21,7 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
+import java.util.*;
 
 /**
  * <p>类路径:cn.yishotech.starter.aop.MultiCachePut</p>
@@ -34,6 +37,8 @@ public class MultiCachePutAspect {
     @Resource
     private RedissonProperties properties;
     @Resource
+    private MultiCacheProperties multiCacheProperties;
+    @Resource
     private IMultiCache multiCache;
 
 
@@ -46,7 +51,10 @@ public class MultiCachePutAspect {
         // 获取缓存key
         String key = getCacheKey(method, joinPoint.getArgs(), properties, annotation);
         // 更新缓存
-        multiCache.setValue(annotation.cacheName(), key, joinPoint.proceed(), annotation.expire(), annotation.timeUnit(), annotation.type());
+        Object value = parsedValue(annotation.type(), joinPoint.proceed());
+        if (Objects.nonNull(value) || multiCacheProperties.isAllowNullValue()) {
+            multiCache.setValue(annotation.cacheName(), key, joinPoint.proceed(), annotation.expire(), annotation.timeUnit(), annotation.type());
+        }
         return joinPoint.proceed();
     }
 
@@ -61,12 +69,32 @@ public class MultiCachePutAspect {
         return String.format("%s%s%s", combinedPrefix, prefix, key);
     }
 
+
+    private Object parsedValue(DataType type, Object value) {
+        if (DataType.LIST.equals(type)) {
+            List<?> list = (List<?>) value;
+            if (!list.isEmpty()) return list;
+        } else if (DataType.MAP.equals(type)) {
+            Map<?, ?> map = (Map<?, ?>) value;
+            if (!map.isEmpty()) return map;
+        } else if (DataType.SET.equals(type)) {
+            Set<?> set = (Set<?>) value;
+            if (!set.isEmpty()) return set;
+        } else if (DataType.SORTEDSET.equals(type)) {
+            SortedSet<?> sortedSet = (SortedSet<?>) value;
+            if (!sortedSet.isEmpty()) return sortedSet;
+        } else {
+            if (Objects.nonNull(value)) return value;
+        }
+        return null;
+    }
+
     private static String parseKeys(Method method, Object[] args, String[] keys) {
         // key列表
         StringBuilder cacheKey = new StringBuilder();
         for (String key : keys) {
             String parsed = SpelUtil.parseEl(method, args, key);
-            if (StringUtils.isBlank(parsed)){
+            if (StringUtils.isBlank(parsed)) {
                 return cacheKey.toString();
             }
             cacheKey.append("_").append(parsed);
