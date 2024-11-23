@@ -17,7 +17,7 @@ Redisson Plus增强组件，通过注解的方式简化了分布式锁、消息�
 
 ```xml
 <dependency>
-    <groupId>cn.yishotech</groupId>
+    <groupId>cn.fuzhizhuang</groupId>
     <artifactId>redisson-plus-spring-boot-starter</artifactId>
     <version>1.0.0</version>
 </dependency>
