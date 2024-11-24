@@ -10,7 +10,7 @@ import java.util.function.Supplier;
  *
  * @author Fu.zhizhuang
  */
-public interface IDistributedLock {
+public interface DistributedLock {
 
     /**
      * 加锁

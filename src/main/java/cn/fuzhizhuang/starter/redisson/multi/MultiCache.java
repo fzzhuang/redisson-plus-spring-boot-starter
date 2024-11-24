@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Fu.zhizhuang
  */
-public interface IMultiCache {
+public interface MultiCache {
 
     /**
      * 存储缓存

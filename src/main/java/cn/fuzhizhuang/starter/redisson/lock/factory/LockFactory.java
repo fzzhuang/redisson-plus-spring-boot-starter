@@ -1,6 +1,6 @@
 package cn.fuzhizhuang.starter.redisson.lock.factory;
 
-import cn.fuzhizhuang.starter.redisson.lock.ILock;
+import cn.fuzhizhuang.starter.redisson.lock.Lock;
 import cn.fuzhizhuang.starter.redisson.lock.strategy.FairLock;
 import cn.fuzhizhuang.starter.redisson.lock.strategy.ReadLock;
 import cn.fuzhizhuang.starter.redisson.lock.strategy.ReentrantLock;
@@ -21,7 +21,7 @@ public class LockFactory {
     @Resource
     private RedissonClient redissonClient;
 
-    public ILock getLock(LockInfo lockInfo) {
+    public Lock getLock(LockInfo lockInfo) {
         return switch (lockInfo.getLockType()) {
             case Fair -> new FairLock(redissonClient, lockInfo);
             case Read -> new ReadLock(redissonClient, lockInfo);

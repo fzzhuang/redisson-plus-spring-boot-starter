@@ -5,7 +5,7 @@ package cn.fuzhizhuang.starter.redisson.lock;
  *
  * @author Fu.zhizhuang
  */
-public interface ILock {
+public interface Lock {
 
     /**
      * 获取锁

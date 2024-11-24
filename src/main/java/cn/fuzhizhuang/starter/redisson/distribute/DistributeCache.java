@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Fu.zhizhuang
  */
-public interface IDistributeCache {
+public interface DistributeCache {
 
     /**
      * 向缓存中保存数据

@@ -43,5 +43,5 @@ public @interface MultiCachePut {
     /**
      * 时间单位
      */
-    TimeUnit timeUnit() default TimeUnit.MINUTES;
+    TimeUnit unit() default TimeUnit.MINUTES;
 }

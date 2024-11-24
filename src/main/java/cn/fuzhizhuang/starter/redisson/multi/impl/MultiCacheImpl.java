@@ -1,18 +1,19 @@
 package cn.fuzhizhuang.starter.redisson.multi.impl;
 
-import cn.fuzhizhuang.starter.redisson.distribute.IDistributeCache;
+import cn.fuzhizhuang.starter.redisson.distribute.DistributeCache;
 import cn.fuzhizhuang.starter.redisson.event.UpdateL1CacheEvent;
 import cn.fuzhizhuang.starter.redisson.model.DataType;
 import cn.fuzhizhuang.starter.redisson.model.OperateType;
 import cn.fuzhizhuang.starter.redisson.model.UpdateCache;
-import cn.fuzhizhuang.starter.redisson.multi.IMultiCache;
 import cn.fuzhizhuang.starter.redisson.subscribe.IMessageQueue;
+import cn.fuzhizhuang.starter.redisson.util.CacheUtil;
 import com.github.benmanes.caffeine.cache.Cache;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -22,10 +23,10 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @Component
-public class MultiCache implements IMultiCache {
+public class MultiCacheImpl implements cn.fuzhizhuang.starter.redisson.multi.MultiCache {
 
     @Resource
-    private IDistributeCache distributeCache;
+    private DistributeCache distributeCache;
     @Resource
     private Map<String, Cache<String, Object>> localCacheMap;
     @Resource
@@ -43,7 +44,7 @@ public class MultiCache implements IMultiCache {
         // 通知更新一级缓存
         updateL1Cache(cacheName, key, value, OperateType.PUT);
         // 二级缓存
-        setCacheValue(key, value, dataType, 0, TimeUnit.MINUTES);
+        CacheUtil.setDistributedValue(key, value, dataType, 0, TimeUnit.MINUTES, distributeCache);
     }
 
     @Override
@@ -62,7 +63,7 @@ public class MultiCache implements IMultiCache {
         // 通知更新一级缓存
         updateL1Cache(cacheName, key, value, OperateType.PUT);
         // 二级缓存
-        setCacheValue(key, value, dataType, timeout, unit);
+        CacheUtil.setDistributedValue(key, value, dataType, timeout, unit, distributeCache);
     }
 
     @Override
@@ -115,46 +116,5 @@ public class MultiCache implements IMultiCache {
             case SORTEDSET -> distributeCache.getSortedSet(key);
             case DEFAULT -> distributeCache.getValue(key);
         };
-    }
-
-    private void setCacheValue(String key, Object data, DataType dataType, long timeout, TimeUnit unit) {
-        boolean hasTimeout = timeout > 0;
-        switch (dataType) {
-            case MAP:
-                if (hasTimeout) {
-                    distributeCache.setMap(key, (Map<?, ?>) data, timeout, unit);
-                } else {
-                    distributeCache.setMap(key, (Map<?, ?>) data);
-                }
-                break;
-            case SET:
-                if (hasTimeout) {
-                    distributeCache.setSet(key, (Set<?>) data, timeout, unit);
-                } else {
-                    distributeCache.setSet(key, (Set<?>) data);
-                }
-                break;
-            case LIST:
-                if (hasTimeout) {
-                    distributeCache.setList(key, (List<?>) data, timeout, unit);
-                } else {
-                    distributeCache.setList(key, (List<?>) data);
-                }
-                break;
-            case SORTEDSET:
-                if (hasTimeout) {
-                    distributeCache.setSortedSet(key, (SortedSet<?>) data, timeout, unit);
-                } else {
-                    distributeCache.setSortedSet(key, (SortedSet<?>) data);
-                }
-                break;
-            case DEFAULT:
-                if (hasTimeout) {
-                    distributeCache.setValue(key, data, timeout, unit);
-                } else {
-                    distributeCache.setValue(key, data);
-                }
-                break;
-        }
     }
 }

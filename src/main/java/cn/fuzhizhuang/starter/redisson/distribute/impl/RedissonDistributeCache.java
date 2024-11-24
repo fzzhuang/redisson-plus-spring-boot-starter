@@ -1,6 +1,6 @@
 package cn.fuzhizhuang.starter.redisson.distribute.impl;
 
-import cn.fuzhizhuang.starter.redisson.distribute.IDistributeCache;
+import cn.fuzhizhuang.starter.redisson.distribute.DistributeCache;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.*;
@@ -13,6 +13,8 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.concurrent.TimeUnit;
 
+import static cn.fuzhizhuang.starter.redisson.util.CacheUtil.parseTimeUnit;
+
 /**
  * Redisson分布式缓存实现
  *
@@ -20,7 +22,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @Service
-public class RedissonDistributeCache implements IDistributeCache {
+public class RedissonDistributeCache implements DistributeCache {
 
     @Resource
     private RedissonClient redissonClient;
@@ -180,22 +182,5 @@ public class RedissonDistributeCache implements IDistributeCache {
         RBloomFilter<T> bloomFilter = redissonClient.getBloomFilter(key);
         bloomFilter.tryInit(expectedInsertions, falsePositiveRate);
         return bloomFilter;
-    }
-
-    /**
-     * 解析TimeUnit格式过期时间
-     *
-     * @param expire 过期时间
-     * @param unit   单位
-     * @return 过期时间
-     */
-    private Duration parseTimeUnit(long expire, TimeUnit unit) {
-        return switch (unit) {
-            case MINUTES -> Duration.ofMinutes(expire);
-            case HOURS -> Duration.ofHours(expire);
-            case DAYS -> Duration.ofDays(expire);
-            case MICROSECONDS -> Duration.ofMillis(expire);
-            default -> Duration.ofSeconds(expire);
-        };
     }
 }

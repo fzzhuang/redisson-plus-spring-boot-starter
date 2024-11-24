@@ -1,7 +1,7 @@
 package cn.fuzhizhuang.starter.redisson.aop;
 
-import cn.fuzhizhuang.starter.redisson.annotation.Lock;
-import cn.fuzhizhuang.starter.redisson.lock.ILock;
+import cn.fuzhizhuang.starter.redisson.annotation.DistributedLock;
+import cn.fuzhizhuang.starter.redisson.lock.Lock;
 import cn.fuzhizhuang.starter.redisson.lock.factory.LockFactory;
 import cn.fuzhizhuang.starter.redisson.model.LockInfo;
 import cn.fuzhizhuang.starter.redisson.util.SpelUtil;
@@ -26,15 +26,15 @@ import java.util.Objects;
 @Slf4j
 @Component
 @Aspect
-public class LockAspect {
+public class DistributedLockAspect {
     public static final String LOCK_NAME_KEY = "lock";
     public static final String LOCK_NAME_SEPARATOR = ".";
 
     @Resource
     private LockFactory lockFactory;
 
-    private static String getBusinessKeyName(Lock lock, ProceedingJoinPoint joinPoint, Method method) {
-        String[] keys = lock.keys();
+    private static String getBusinessKeyName(DistributedLock distributedLock, ProceedingJoinPoint joinPoint, Method method) {
+        String[] keys = distributedLock.keys();
         List<String> keyList = parseKeys(joinPoint, keys, method);
         // 业务key名
         return getKeyName(keyList);
@@ -66,22 +66,22 @@ public class LockAspect {
         }
     }
 
-    @Around("@annotation(cn.fuzhizhuang.starter.redisson.annotation.Lock)")
+    @Around("@annotation(cn.fuzhizhuang.starter.redisson.annotation.DistributedLock)")
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
         // 获取方法
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
         // 获取Lock注解信息
-        Lock lockAnnotation = method.getAnnotation(Lock.class);
-        String lockName = LOCK_NAME_KEY + LOCK_NAME_SEPARATOR + getLockNameKey(lockAnnotation.name(), method) + getBusinessKeyName(lockAnnotation, joinPoint, method);
+        DistributedLock distributedLockAnnotation = method.getAnnotation(DistributedLock.class);
+        String lockName = LOCK_NAME_KEY + LOCK_NAME_SEPARATOR + getLockNameKey(distributedLockAnnotation.name(), method) + getBusinessKeyName(distributedLockAnnotation, joinPoint, method);
         log.info("lockName: {}", lockName);
         LockInfo lockInfo = LockInfo.builder()
                 .name(lockName)
-                .lockType(lockAnnotation.type())
-                .waitTime(lockAnnotation.waitTime())
-                .leaseTime(lockAnnotation.leaseTime())
+                .lockType(distributedLockAnnotation.type())
+                .waitTime(distributedLockAnnotation.waitTime())
+                .leaseTime(distributedLockAnnotation.leaseTime())
                 .build();
-        ILock lock = lockFactory.getLock(lockInfo);
+        Lock lock = lockFactory.getLock(lockInfo);
         boolean acquired = false;
         try {
             acquired = lock.acquire();

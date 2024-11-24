@@ -1,6 +1,6 @@
 package cn.fuzhizhuang.starter.redisson.lock.impl;
 
-import cn.fuzhizhuang.starter.redisson.lock.IDistributedLock;
+import cn.fuzhizhuang.starter.redisson.lock.DistributedLock;
 import jakarta.annotation.Resource;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -15,7 +15,7 @@ import java.util.function.Supplier;
  * @author Fu.zhizhuang
  */
 @Component
-public class RedissonDistributedLock implements IDistributedLock {
+public class RedissonDistributedLock implements DistributedLock {
 
     @Resource
     private RedissonClient redissonClient;

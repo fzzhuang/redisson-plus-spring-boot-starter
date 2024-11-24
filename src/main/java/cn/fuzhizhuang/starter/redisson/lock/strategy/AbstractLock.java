@@ -1,6 +1,6 @@
 package cn.fuzhizhuang.starter.redisson.lock.strategy;
 
-import cn.fuzhizhuang.starter.redisson.lock.ILock;
+import cn.fuzhizhuang.starter.redisson.lock.Lock;
 import cn.fuzhizhuang.starter.redisson.model.LockInfo;
 import lombok.Data;
 import org.redisson.api.RLock;
@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
  * @author Fu.zhizhuang
  */
 @Data
-public abstract class AbstractLock implements ILock {
+public abstract class AbstractLock implements Lock {
 
     protected LockInfo lockInfo;
 

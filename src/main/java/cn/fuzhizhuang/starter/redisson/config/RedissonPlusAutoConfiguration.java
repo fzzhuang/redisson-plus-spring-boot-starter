@@ -5,9 +5,10 @@ import cn.fuzhizhuang.starter.redisson.aop.*;
 import cn.fuzhizhuang.starter.redisson.distribute.impl.RedissonDistributeCache;
 import cn.fuzhizhuang.starter.redisson.lock.factory.LockFactory;
 import cn.fuzhizhuang.starter.redisson.lock.impl.RedissonDistributedLock;
-import cn.fuzhizhuang.starter.redisson.multi.impl.MultiCache;
+import cn.fuzhizhuang.starter.redisson.multi.impl.MultiCacheImpl;
 import cn.fuzhizhuang.starter.redisson.multi.listener.UpdateL1CacheListener;
 import cn.fuzhizhuang.starter.redisson.subscribe.impl.RedissonMessageQueue;
+import cn.fuzhizhuang.starter.redisson.util.CacheUtil;
 import com.alibaba.fastjson2.JSON;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -128,24 +129,24 @@ public class RedissonPlusAutoConfiguration {
     }
 
     @Bean
-    public LockAspect lockAspect() {
-        return new LockAspect();
+    public DistributedLockAspect lockAspect() {
+        return new DistributedLockAspect();
     }
 
-    @Bean
-    public RedissonCacheAspect redissonCacheAspect() {
-        return new RedissonCacheAspect();
-    }
-
-    @Bean
-    public RedissonCacheEvictAspect redissonCacheEvictAspect() {
-        return new RedissonCacheEvictAspect();
-    }
-
-    @Bean
-    public RedissonCachePutAspect redissonCachePutAspect() {
-        return new RedissonCachePutAspect();
-    }
+//    @Bean
+//    public RedissonCacheAspect redissonCacheAspect() {
+//        return new RedissonCacheAspect();
+//    }
+//
+//    @Bean
+//    public RedissonCacheEvictAspect redissonCacheEvictAspect() {
+//        return new RedissonCacheEvictAspect();
+//    }
+//
+//    @Bean
+//    public RedissonCachePutAspect redissonCachePutAspect() {
+//        return new RedissonCachePutAspect();
+//    }
 
     @Bean
     public RedissonDistributeCache redissonDistributeCache() {
@@ -179,7 +180,7 @@ public class RedissonPlusAutoConfiguration {
             Cache<String, Object> cache = Caffeine.newBuilder()
                     .initialCapacity(l1Cache.getInitialCapacity())
                     .maximumSize(l1Cache.getMaximumSize())
-                    .expireAfterWrite(parseTimeUnit(l1Cache.getExpire(), l1Cache.getTimeUnit()))
+                    .expireAfterWrite(CacheUtil.parseTimeUnit(l1Cache.getExpire(), l1Cache.getTimeUnit()))
                     .build();
             cacheMap.put(l1Cache.getCacheName(), cache);
         }
@@ -187,8 +188,8 @@ public class RedissonPlusAutoConfiguration {
     }
 
     @Bean
-    public MultiCache multiCache() {
-        return new MultiCache();
+    public MultiCacheImpl multiCache() {
+        return new MultiCacheImpl();
     }
 
     @Bean
@@ -196,35 +197,18 @@ public class RedissonPlusAutoConfiguration {
         return new MultiCacheAspect();
     }
 
-    @Bean
-    public MultiCacheEvictAspect multiCacheEvictAspect() {
-        return new MultiCacheEvictAspect();
-    }
-
-    @Bean
-    public MultiCachePutAspect multiCachePutAspect() {
-        return new MultiCachePutAspect();
-    }
+//    @Bean
+//    public MultiCacheEvictAspect multiCacheEvictAspect() {
+//        return new MultiCacheEvictAspect();
+//    }
+//
+//    @Bean
+//    public MultiCachePutAspect multiCachePutAspect() {
+//        return new MultiCachePutAspect();
+//    }
 
     @Bean
     public UpdateL1CacheListener updateL1CacheListener() {
         return new UpdateL1CacheListener();
-    }
-
-    /**
-     * 解析TimeUnit格式过期时间
-     *
-     * @param expire 过期时间
-     * @param unit   单位
-     * @return 过期时间
-     */
-    private Duration parseTimeUnit(long expire, TimeUnit unit) {
-        return switch (unit) {
-            case MINUTES -> Duration.ofMinutes(expire);
-            case HOURS -> Duration.ofHours(expire);
-            case DAYS -> Duration.ofDays(expire);
-            case MICROSECONDS -> Duration.ofMillis(expire);
-            default -> Duration.ofSeconds(expire);
-        };
     }
 }
