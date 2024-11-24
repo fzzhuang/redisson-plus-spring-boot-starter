@@ -20,6 +20,11 @@ public class RedissonProperties {
     private boolean enabled = true;
 
     /**
+     * 是否允许缓存null值，默认为false。
+     */
+    private boolean allowNullValue = false;
+
+    /**
      * Redisson 连接地址，例如：redis://127.0.0.1:6379。
      */
     private String address;

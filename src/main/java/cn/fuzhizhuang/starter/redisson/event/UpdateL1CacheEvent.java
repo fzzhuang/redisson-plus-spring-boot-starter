@@ -16,7 +16,7 @@ public class UpdateL1CacheEvent extends Event<UpdateCache> {
 
     public static UpdateL1CacheEvent create(UpdateCache event) {
         UpdateL1CacheEvent updateL1CacheEvent = new UpdateL1CacheEvent();
-        updateL1CacheEvent.setDesc("更新L1缓存");
+        updateL1CacheEvent.setDesc("updateL1Cache");
         updateL1CacheEvent.setData(event);
         return updateL1CacheEvent;
     }

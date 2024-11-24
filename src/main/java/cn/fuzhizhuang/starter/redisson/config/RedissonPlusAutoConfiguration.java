@@ -36,13 +36,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.CollectionUtils;
 
-import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Redisson Plus自动配置
@@ -133,20 +131,20 @@ public class RedissonPlusAutoConfiguration {
         return new DistributedLockAspect();
     }
 
-//    @Bean
-//    public RedissonCacheAspect redissonCacheAspect() {
-//        return new RedissonCacheAspect();
-//    }
-//
-//    @Bean
-//    public RedissonCacheEvictAspect redissonCacheEvictAspect() {
-//        return new RedissonCacheEvictAspect();
-//    }
-//
-//    @Bean
-//    public RedissonCachePutAspect redissonCachePutAspect() {
-//        return new RedissonCachePutAspect();
-//    }
+    @Bean
+    public RedissonCacheAspect redissonCacheAspect() {
+        return new RedissonCacheAspect();
+    }
+
+    @Bean
+    public RedissonCacheEvictAspect redissonCacheEvictAspect() {
+        return new RedissonCacheEvictAspect();
+    }
+
+    @Bean
+    public RedissonCachePutAspect redissonCachePutAspect() {
+        return new RedissonCachePutAspect();
+    }
 
     @Bean
     public RedissonDistributeCache redissonDistributeCache() {
@@ -197,15 +195,15 @@ public class RedissonPlusAutoConfiguration {
         return new MultiCacheAspect();
     }
 
-//    @Bean
-//    public MultiCacheEvictAspect multiCacheEvictAspect() {
-//        return new MultiCacheEvictAspect();
-//    }
-//
-//    @Bean
-//    public MultiCachePutAspect multiCachePutAspect() {
-//        return new MultiCachePutAspect();
-//    }
+    @Bean
+    public MultiCacheEvictAspect multiCacheEvictAspect() {
+        return new MultiCacheEvictAspect();
+    }
+
+    @Bean
+    public MultiCachePutAspect multiCachePutAspect() {
+        return new MultiCachePutAspect();
+    }
 
     @Bean
     public UpdateL1CacheListener updateL1CacheListener() {

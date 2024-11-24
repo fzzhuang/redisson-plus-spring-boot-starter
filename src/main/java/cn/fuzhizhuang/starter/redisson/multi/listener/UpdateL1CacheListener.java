@@ -28,7 +28,7 @@ public class UpdateL1CacheListener implements MessageListener<UpdateL1CacheEvent
 
     @Override
     public void onMessage(CharSequence charSequence, UpdateL1CacheEvent updateCacheEvent) {
-        log.info("接收到更新L1 cache消息, message:{}", JSON.toJSONString(updateCacheEvent));
+        log.debug("接收到更新L1 cache消息, message:{}", JSON.toJSONString(updateCacheEvent));
         UpdateCache updateCache = updateCacheEvent.getData();
         OperateType operateType = updateCache.getOperateType();
         String cacheName = updateCache.getCacheName();

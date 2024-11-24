@@ -17,6 +17,14 @@ import java.util.concurrent.TimeUnit;
  */
 public class CacheUtil {
 
+    /**
+     * 解析key
+     *
+     * @param method 方法
+     * @param args   参数
+     * @param keys   key列表
+     * @return key
+     */
     public static String parseKeys(Method method, Object[] args, String[] keys) {
         // key列表
         StringBuilder cacheKey = new StringBuilder();
@@ -31,6 +39,14 @@ public class CacheUtil {
         return cacheKey.toString();
     }
 
+    /**
+     * 构建缓存key
+     *
+     * @param cachePrefix 缓存前缀
+     * @param prefix      缓存key前缀
+     * @param key         缓存key
+     * @return 缓存key
+     */
     public static String buildCacheKey(String cachePrefix, String prefix, String key) {
         // 避免重复判断字符串是否为空
         boolean prefixBlank = StringUtils.isBlank(cachePrefix);
@@ -38,6 +54,13 @@ public class CacheUtil {
         return String.format("%s%s%s", combinedPrefix, prefix, key);
     }
 
+    /**
+     * 解析参数值
+     *
+     * @param type  参数类型
+     * @param value 参数值
+     * @return 解析后的参数值
+     */
     public static Object parsedValue(DataType type, Object value) {
         if (DataType.LIST.equals(type)) {
             List<?> list = (List<?>) value;
@@ -57,24 +80,6 @@ public class CacheUtil {
         return null;
     }
 
-    public static Object getCacheValue(Object value, DataType dataType) {
-        if (DataType.LIST.equals(dataType)) {
-            List<?> list = (List<?>) value;
-            if (!list.isEmpty()) return new ArrayList<>(list);
-        } else if (DataType.SET.equals(dataType)) {
-            Set<?> set = (Set<?>) value;
-            if (!set.isEmpty()) return set;
-        } else if (DataType.SORTEDSET.equals(dataType)) {
-            SortedSet<?> sortedSet = (SortedSet<?>) value;
-            if (!sortedSet.isEmpty()) return sortedSet;
-        } else if (DataType.MAP.equals(dataType)) {
-            Map<?, ?> map = (Map<?, ?>) value;
-            if (!map.isEmpty()) return map;
-        } else if (DataType.DEFAULT.equals(dataType)) {
-            if (Objects.nonNull(value)) return value;
-        }
-        return null;
-    }
 
     /**
      * 设置缓存值
@@ -146,6 +151,24 @@ public class CacheUtil {
                 }
                 break;
         }
+    }
+
+    /**
+     * 获取分布式缓存值
+     *
+     * @param key             缓存key
+     * @param dataType        缓存类型
+     * @param distributeCache 分布式缓存
+     * @return 缓存值
+     */
+    public static Object getDistributeCacheValue(String key, DataType dataType, DistributeCache distributeCache) {
+        return switch (dataType) {
+            case MAP -> distributeCache.getMap(key);
+            case LIST -> distributeCache.getList(key);
+            case SET -> distributeCache.getSet(key);
+            case SORTEDSET -> distributeCache.getSortedSet(key);
+            case DEFAULT -> distributeCache.getValue(key);
+        };
     }
 
     /**

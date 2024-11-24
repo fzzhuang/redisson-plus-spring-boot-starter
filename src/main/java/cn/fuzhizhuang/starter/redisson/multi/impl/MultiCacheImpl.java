@@ -5,6 +5,7 @@ import cn.fuzhizhuang.starter.redisson.event.UpdateL1CacheEvent;
 import cn.fuzhizhuang.starter.redisson.model.DataType;
 import cn.fuzhizhuang.starter.redisson.model.OperateType;
 import cn.fuzhizhuang.starter.redisson.model.UpdateCache;
+import cn.fuzhizhuang.starter.redisson.multi.MultiCache;
 import cn.fuzhizhuang.starter.redisson.subscribe.IMessageQueue;
 import cn.fuzhizhuang.starter.redisson.util.CacheUtil;
 import com.github.benmanes.caffeine.cache.Cache;
@@ -23,7 +24,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @Component
-public class MultiCacheImpl implements cn.fuzhizhuang.starter.redisson.multi.MultiCache {
+public class MultiCacheImpl implements MultiCache {
 
     @Resource
     private DistributeCache distributeCache;
@@ -77,7 +78,7 @@ public class MultiCacheImpl implements cn.fuzhizhuang.starter.redisson.multi.Mul
         Object ifPresent = cache.getIfPresent(key);
         if (Objects.nonNull(ifPresent)) return (T) ifPresent;
         // 从二级缓存获取数据
-        Object cacheValue = getCacheValue(key, dataType);
+        Object cacheValue = CacheUtil.getDistributeCacheValue(key, dataType, distributeCache);
         if (Objects.nonNull(cacheValue)) {
             updateL1Cache(cacheName, key, cacheValue, OperateType.PUT);
         }
@@ -106,15 +107,5 @@ public class MultiCacheImpl implements cn.fuzhizhuang.starter.redisson.multi.Mul
         UpdateL1CacheEvent event = UpdateL1CacheEvent.create(updateCache);
         // 发送消息
         messageQueue.sendMessage("updateL1Cache", event);
-    }
-
-    private Object getCacheValue(String key, DataType dataType) {
-        return switch (dataType) {
-            case MAP -> distributeCache.getMap(key);
-            case LIST -> distributeCache.getList(key);
-            case SET -> distributeCache.getSet(key);
-            case SORTEDSET -> distributeCache.getSortedSet(key);
-            case DEFAULT -> distributeCache.getValue(key);
-        };
     }
 }

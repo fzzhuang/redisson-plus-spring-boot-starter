@@ -1,8 +1,8 @@
 package cn.fuzhizhuang.starter.redisson.aop;
 
-import cn.fuzhizhuang.starter.redisson.config.MultiCacheProperties;
+import cn.fuzhizhuang.starter.redisson.annotation.RedissonCache;
 import cn.fuzhizhuang.starter.redisson.config.RedissonProperties;
-import cn.fuzhizhuang.starter.redisson.multi.MultiCache;
+import cn.fuzhizhuang.starter.redisson.distribute.DistributeCache;
 import cn.fuzhizhuang.starter.redisson.util.CacheUtil;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -16,45 +16,42 @@ import java.lang.reflect.Method;
 import java.util.Objects;
 
 /**
- * 多级缓存查询切面
+ * 分布式缓存切面
  *
  * @author Fu.zhizhuang
  */
 @Slf4j
-@Aspect
 @Component
-public class MultiCacheAspect {
+@Aspect
+public class RedissonCacheAspect {
 
     @Resource
     private RedissonProperties properties;
     @Resource
-    private MultiCacheProperties multiCacheProperties;
-    @Resource
-    private MultiCache multiCache;
+    private DistributeCache distributeCache;
 
-
-    @Around("@annotation(cn.fuzhizhuang.starter.redisson.annotation.MultiCache)")
+    @Around("@annotation(cn.fuzhizhuang.starter.redisson.annotation.RedissonCache)")
     public Object around(ProceedingJoinPoint joinPoint) {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
         // 获取注解信息
-        cn.fuzhizhuang.starter.redisson.annotation.MultiCache annotation = method.getAnnotation(cn.fuzhizhuang.starter.redisson.annotation.MultiCache.class);
+        RedissonCache annotation = method.getAnnotation(RedissonCache.class);
         // 获取缓存key
         String cacheKey = getCacheKey(method, joinPoint.getArgs(), properties, annotation);
         // 获取缓存中数据
-        Object value = CacheUtil.parsedValue(annotation.type(), multiCache.getValue(annotation.cacheName(), cacheKey, annotation.type()));
+        Object value = CacheUtil.getDistributeCacheValue(cacheKey, annotation.type(), distributeCache);
         // 缓存中有数据，直接返回
         if (Objects.nonNull(value)) return value;
         try {
             Object proceed = joinPoint.proceed();
-            return CacheUtil.setMultiCacheValue(annotation.cacheName(), cacheKey, proceed, annotation.expire(), annotation.unit(), annotation.type(), multiCacheProperties.isAllowNullValue(), multiCache);
+            CacheUtil.setDistributedValue(cacheKey, proceed, annotation.type(), annotation.expire(), annotation.unit(), distributeCache);
+            return proceed;
         } catch (Throwable e) {
-            log.error("MultiCacheAspect error", e);
             throw new RuntimeException(e);
         }
     }
 
-    private String getCacheKey(Method method, Object[] args, RedissonProperties properties, cn.fuzhizhuang.starter.redisson.annotation.MultiCache annotation) {
+    private String getCacheKey(Method method, Object[] args, RedissonProperties properties, RedissonCache annotation) {
         String cachePrefix = properties.getCachePrefix();
         String prefix = annotation.prefix();
         String[] keys = annotation.keys();

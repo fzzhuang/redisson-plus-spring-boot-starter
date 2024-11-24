@@ -27,14 +27,14 @@ public class RedissonMessageQueue implements IMessageQueue {
 
     @Override
     public void sendMessage(String topic, Event<?> event) {
-        log.info("发送消息 topic:{} event:{}", topic, JSON.toJSONString(event));
+        log.debug("发送消息 topic:{} event:{}", topic, JSON.toJSONString(event));
         RTopic rTopic = redissonClient.getTopic(topic);
         rTopic.publish(event);
     }
 
     @Override
     public void sendDelayMessage(String topic, Event<?> event, long delay) {
-        log.info("延迟队列 topic:{} event:{} delay:{}", topic, JSON.toJSONString(event), delay);
+        log.debug("延迟队列 topic:{} event:{} delay:{}", topic, JSON.toJSONString(event), delay);
         // 1. 创建阻塞队列
         RBlockingQueue<Object> blockingQueue = redissonClient.getBlockingQueue(topic);
         // 2. 将创建的阻塞队列放入延迟队列中
@@ -45,7 +45,7 @@ public class RedissonMessageQueue implements IMessageQueue {
 
     @Override
     public void sendDelayMessage(String topic, Event<?> event, long delay, TimeUnit timeUnit) {
-        log.info("延迟队列 topic:{} event:{} delay:{} unit:{}", topic, JSON.toJSONString(event), delay, timeUnit);
+        log.debug("延迟队列 topic:{} event:{} delay:{} unit:{}", topic, JSON.toJSONString(event), delay, timeUnit);
         // 1. 创建阻塞队列
         RBlockingQueue<Object> blockingQueue = redissonClient.getBlockingQueue(topic);
         // 2. 将创建的阻塞队列放入延迟队列中
@@ -56,7 +56,7 @@ public class RedissonMessageQueue implements IMessageQueue {
 
     @Override
     public boolean cancelDelayMessage(String topic, Event<?> event) {
-        log.info("移除延迟队列 topic:{} event:{}", topic, JSON.toJSONString(event));
+        log.debug("移除延迟队列 topic:{} event:{}", topic, JSON.toJSONString(event));
         return redissonClient.getBlockingDeque(topic).remove(event);
     }
 }
