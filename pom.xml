@@ -10,7 +10,8 @@
         <version>3.3.3</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>cn.fuzhizhuang</groupId>
+
+    <groupId>cn.fzzhuang</groupId>
     <artifactId>redisson-plus-spring-boot-starter</artifactId>
     <version>1.0.0</version>
     <name>redisson-plus-spring-boot-starter</name>
@@ -28,8 +29,8 @@
     <!-- 开发人员信息 -->
     <developers>
         <developer>
-            <name>Fu.zhizhuang</name>
-            <email>jason_zong@hotmail.com</email>
+            <name>fzzhuang</name>
+            <email>fzzhuang@outlook.com</email>
         </developer>
     </developers>
 

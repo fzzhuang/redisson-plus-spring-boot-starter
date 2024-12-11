@@ -1,4 +1,13 @@
-<h3 align="center">Redisson Plus Starter</h3>
+<h1 align="center">Redisson封装工具类</h1>
+<p align="center">
+  <img src="https://img.shields.io/github/languages/code-size/fzzhuang/redisson-plus-spring-boot-starter" alt="code size"/>
+  <img src="https://img.shields.io/badge/Spring%20Boot-3.3.3-brightgreen" alt="Spring Boot"/>
+  <img src="https://img.shields.io/github/languages/count/fzzhuang/redisson-plus-spring-boot-starter" alt="languages"/>
+  <img src="https://img.shields.io/badge/Java-17-blue" alt="Java"/>
+  <img src="https://img.shields.io/github/last-commit/fzzhuang/redisson-plus-spring-boot-starter" alt="last commit"/><br>
+  <img src="https://img.shields.io/badge/Author-fzzhuang-orange" alt="Author" />
+</p>
+<hr>
 
 ## 介绍
 Redisson Plus增强组件，通过注解的方式简化了分布式锁、消息队列、发布订阅、缓存等。
@@ -17,7 +26,7 @@ Redisson Plus增强组件，通过注解的方式简化了分布式锁、消息�
 
 ```xml
 <dependency>
-    <groupId>cn.fuzhizhuang</groupId>
+    <groupId>cn.fzzhuang</groupId>
     <artifactId>redisson-plus-spring-boot-starter</artifactId>
     <version>1.0.0</version>
 </dependency>
